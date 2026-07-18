@@ -1,0 +1,11 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+
+# example / test outputs
+example_out*.png
+base_plain.png
+out_*.png
+out_*.pdf
+_contact_sheet.png

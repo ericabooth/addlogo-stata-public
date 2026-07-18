@@ -1,0 +1,33 @@
+v 3
+d addlogo. Stamp a logo onto a Stata graph.
+d
+d Stata cannot place a raster image inside the plot region, so addlogo
+d exports the current (or named) graph and composites a logo onto it,
+d sized relative to the graph width so it looks the same at any export
+d resolution.  It stamps the current graph, a named graph, a saved .gph,
+d or an already-exported image; nine positions, opacity, and PNG / TIF /
+d JPG / PDF output.
+d
+d The compositing is done by ImageMagick (the "magick" CLI) or by a
+d Python + Pillow helper -- whichever is present (engine(auto)).
+d
+d   addlogo [using image] , logo(file) saving(file) [position() scale() ...]
+d
+d Requires: Stata 16+, plus one image engine --
+d   ImageMagick        (brew install imagemagick), or
+d   Python 3 + Pillow  (pip install Pillow).
+d
+d KW: graph
+d KW: logo
+d KW: image
+d KW: branding
+d KW: watermark
+d KW: export
+d
+d Author: Eric A. Booth, Sr Researcher, Texas2036.org
+d Support: eric.a.booth@gmail.com
+d Distribution-Date: 20260718
+d
+f addlogo.ado
+f addlogo.sthlp
+f addlogo_helper.py

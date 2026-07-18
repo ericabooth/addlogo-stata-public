@@ -1,0 +1,3 @@
+v 3
+d addlogo: stamp a logo onto a Stata graph (export, then composite)
+p addlogo
