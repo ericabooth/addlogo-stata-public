@@ -102,4 +102,4 @@ python addlogo_helper.py --base fig.png --logo logo.png --out fig.png --position
 
 ## Author and license
 
-Eric A. Booth, Sr Researcher, Texas2036.org (eric.a.booth@gmail.com), 2026. MIT-licensed. Part of a Stata suite alongside [`googlechart`](https://github.com/ericabooth/googlechart-stata-public), [`googlesheets`](https://github.com/ericabooth/googlesheets-stata-public), and [`webapi`](https://github.com/ericabooth/webapi-stata-public).
+Eric A. Booth, Sr Researcher, Texas 2036 (eric.a.booth@gmail.com), 2026. MIT-licensed. Part of a Stata suite alongside [`googlechart`](https://github.com/ericabooth/googlechart-stata-public), [`googlesheets`](https://github.com/ericabooth/googlesheets-stata-public), and [`webapi`](https://github.com/ericabooth/webapi-stata-public).

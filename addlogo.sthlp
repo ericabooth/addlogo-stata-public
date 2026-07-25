@@ -220,7 +220,7 @@ a raster-in-PDF, which embeds fine for most uses.
 {title:Author}
 
 {pstd}
-Eric A. Booth, Sr Researcher, Texas2036.org.
+Eric A. Booth, Sr Researcher, Texas 2036.
 Email {browse "mailto:eric.a.booth@gmail.com":eric.a.booth@gmail.com}.
 MIT-licensed.  A companion to {help googlechart}, {help googlesheets}, and
 {help webapi}.
