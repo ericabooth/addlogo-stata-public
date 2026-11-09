@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.0  2026-07-18}{...}
+{* *! version 1.0.1  2026-11-09}{...}
 {viewerjumpto "Syntax" "addlogo##syntax"}{...}
 {viewerjumpto "Description" "addlogo##description"}{...}
 {viewerjumpto "Getting started" "addlogo##quickstart"}{...}
@@ -104,15 +104,22 @@ background gives the cleanest result; {cmd:opacity()} can fade it further.
 {phang}
 {cmdab:sav:ing(}{it:file}{cmd:)} is the output file.  Its extension sets the
 format ({cmd:.png}, {cmd:.tif}, {cmd:.jpg}, {cmd:.pdf}).  Combine with
-{cmd:replace} to overwrite an existing file.
+{cmd:replace} to overwrite an existing file.  The result is composited into a
+temporary file beside {cmd:saving()} and copied into place only on success, so
+{cmd:saving()} may name the same image as {cmd:using} (re-branding in place),
+and a failed run leaves an existing {cmd:saving()} file untouched.  A leading
+{cmd:~} in {cmd:logo()}, {cmd:saving()} or {cmd:using} is expanded from
+{cmd:HOME}.
 
 {dlgtab:Placement}
 
 {phang}
 {cmdab:pos:ition(}{it:anchor}{cmd:)} chooses one of nine anchors: {cmd:nw n ne}
 (top), {cmd:w c e} (middle), {cmd:sw s se} (bottom).  Long forms
-({cmd:northwest}, {cmd:top-left}, ...) are also accepted.  The default is
-{cmd:se} (bottom-right).
+({cmd:northwest}, {cmd:north}, {cmd:top-left}, {cmd:top}, {cmd:center},
+{cmd:centre}, {cmd:middle}, {cmd:left}, {cmd:right}, {cmd:bottom-right}, ...)
+are also accepted by both engines.  Any other value is an error (r(198)).  The
+default is {cmd:se} (bottom-right).
 
 {phang}
 {cmdab:sc:ale(}{it:#}{cmd:)} sets the logo width as a fraction of the graph
@@ -197,6 +204,21 @@ On macOS, a Stata launched from the Dock has a minimal {cmd:PATH} that omits
 
 {pstd}Re-brand an already-exported image:{p_end}
 {phang2}{cmd:. addlogo using "old.png", logo("logo.png") saving("old_branded.png") replace}{p_end}
+
+{pstd}Re-brand it in place:{p_end}
+{phang2}{cmd:. addlogo using "old.png", logo("logo.png") saving("old.png") replace}{p_end}
+
+
+{marker changes}{...}
+{title:Changes}
+
+{phang}1.0.1 (2026-11-09): long-form positions ({cmd:northwest}, {cmd:top-left},
+{cmd:center}, ...) now work with the ImageMagick engine (they fell back to
+{cmd:se}); an unknown position is an error; re-branding in place no longer
+deletes the source image; an unreadable logo now fails instead of reusing a
+logo resized by an earlier call; temporary files are removed on every exit;
+the width probe no longer uses {cmd:/dev/null} on Windows; a leading {cmd:~} is
+expanded.{p_end}
 
 {pstd}Batch-brand every {cmd:.gph} in a folder:{p_end}
 {phang2}{cmd:. local files : dir "graphs" files "*.gph"}{p_end}

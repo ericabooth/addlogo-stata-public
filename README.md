@@ -41,7 +41,7 @@ global ADDLOGO_PY     "/opt/homebrew/bin/python3"      // the python3 that has P
 |--------|---------|---------|
 | `logo(file)`      | —      | logo image, ideally a **PNG with transparency** *(required)* |
 | `saving(file)`    | —      | output; format from extension (`png` `tif` `jpg` `pdf`) *(required)* |
-| `position(str)`   | `se`   | `nw n ne w c e sw s se` (long forms + `top-left` etc. ok) |
+| `position(str)`   | `se`   | `nw n ne w c e sw s se` (long forms + `top-left` etc. ok with both engines; anything else is an error) |
 | `scale(#)`        | `.12`  | logo **width as a fraction of the graph width** |
 | `pad(#)`          | `.02`  | margin from the edge, as a fraction of graph width |
 | `opacity(#)`      | `1`    | `0`–`1` alpha multiplier (e.g. `.85` for a subtle watermark) |
@@ -50,7 +50,7 @@ global ADDLOGO_PY     "/opt/homebrew/bin/python3"      // the python3 that has P
 | `engine(str)`     | `auto` | `auto` \| `python` \| `magick` |
 | `pyexec(str)`     | —      | python interpreter that has Pillow |
 | `magickexec(str)` | —      | path to the `magick` binary |
-| `replace`         | —      | overwrite `saving()` |
+| `replace`         | —      | overwrite `saving()` (written only after the composite succeeds, so `saving()` may equal `using`) |
 
 `addlogo` is `rclass`: it returns `r(file)` (the output written) and `r(engine)`.
 
@@ -85,6 +85,7 @@ foreach f of local files {
 
 ```stata
 addlogo using "old_figure.png", logo("$LOGO") saving("old_figure_branded.png") replace
+addlogo using "old_figure.png", logo("$LOGO") saving("old_figure.png") replace   // in place
 ```
 
 The helper also runs straight from a shell / Makefile, bypassing Stata:
@@ -103,3 +104,7 @@ python addlogo_helper.py --base fig.png --logo logo.png --out fig.png --position
 ## Author and license
 
 Eric A. Booth, Sr Researcher, Texas 2036 (eric.a.booth@gmail.com), 2026. MIT-licensed. Part of a Stata suite alongside [`googlechart`](https://github.com/ericabooth/googlechart-stata-public), [`googlesheets`](https://github.com/ericabooth/googlesheets-stata-public), and [`webapi`](https://github.com/ericabooth/webapi-stata-public).
+
+## Changes
+
+- **1.0.1 (2026-11-09):** long-form positions (`northwest`, `top-left`, `center`, ...) now work with the ImageMagick engine (they silently fell back to `se`), and an unknown position is an error (r(198)). Re-branding in place (`using X ... saving(X) replace`) no longer deletes `X`: the composite goes to a temporary file and is copied over `saving()` only on success. An unreadable logo now fails instead of reusing a logo resized by an earlier call, and temporary files are removed on every exit. The width probe no longer redirects to `/dev/null` on Windows. A leading `~` in `logo()`, `saving()` or `using` is expanded from `HOME`.
