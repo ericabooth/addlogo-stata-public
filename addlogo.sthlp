@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0.1  2026-11-09}{...}
+{* *! version 1.0.2  2026-11-09}{...}
 {viewerjumpto "Syntax" "addlogo##syntax"}{...}
 {viewerjumpto "Description" "addlogo##description"}{...}
 {viewerjumpto "Getting started" "addlogo##quickstart"}{...}
@@ -107,7 +107,8 @@ format ({cmd:.png}, {cmd:.tif}, {cmd:.jpg}, {cmd:.pdf}).  Combine with
 {cmd:replace} to overwrite an existing file.  The result is composited into a
 temporary file beside {cmd:saving()} and copied into place only on success, so
 {cmd:saving()} may name the same image as {cmd:using} (re-branding in place),
-and a failed run leaves an existing {cmd:saving()} file untouched.  A leading
+and a failed run leaves an existing {cmd:saving()} file untouched.  The folder
+named in {cmd:saving()} must already exist (r(603) otherwise).  A leading
 {cmd:~} in {cmd:logo()}, {cmd:saving()} or {cmd:using} is expanded from
 {cmd:HOME}.
 
@@ -124,14 +125,18 @@ default is {cmd:se} (bottom-right).
 {phang}
 {cmdab:sc:ale(}{it:#}{cmd:)} sets the logo width as a fraction of the graph
 width.  {cmd:scale(.12)} (the default) makes the logo 12% as wide as the graph.
+It must be greater than 0 and at most 1.
 
 {phang}
 {cmd:pad(}{it:#}{cmd:)} is the margin between the logo and the graph edge, as a
-fraction of the graph width (default {cmd:.02}).
+fraction of the graph width (default {cmd:.02}).  It must be at least 0 and less
+than .5.
 
 {phang}
 {cmdab:op:acity(}{it:#}{cmd:)} multiplies the logo's alpha channel; {cmd:1} is
-opaque, {cmd:.85} a light watermark.
+opaque, {cmd:.85} a light watermark.  A logo without an alpha channel (a JPG, or
+a PNG without transparency) is given one first, so both engines fade it the
+same way.
 
 {dlgtab:Source graph}
 
@@ -154,6 +159,10 @@ binary is found, otherwise Python).
 {cmdab:py:exec(}{it:path}{cmd:)} and {cmdab:magick:exec(}{it:path}{cmd:)} give
 the full path to the interpreter / binary.  Alternatively set the globals
 {cmd:$ADDLOGO_PY} and {cmd:$ADDLOGO_MAGICK} once in your {help profile}.
+Without them, {cmd:addlogo} probes the usual Homebrew and system locations, and
+on Windows the {cmd:ImageMagick-*} folders under {cmd:Program Files}, the
+python.org installs under {cmd:%LOCALAPPDATA%/Programs/Python}, and the
+{cmd:py} launcher.  If compositing fails, the engine's own messages are shown.
 
 
 {marker engines}{...}
@@ -208,9 +217,25 @@ On macOS, a Stata launched from the Dock has a minimal {cmd:PATH} that omits
 {pstd}Re-brand it in place:{p_end}
 {phang2}{cmd:. addlogo using "old.png", logo("logo.png") saving("old.png") replace}{p_end}
 
+{pstd}Batch-brand every {cmd:.gph} in a folder (the output folder must exist):{p_end}
+{phang2}{cmd:. capture mkdir "branded"}{p_end}
+{phang2}{cmd:. local files : dir "graphs" files "*.gph"}{p_end}
+{phang2}{cmd:. foreach f of local files {c -(}}{p_end}
+{phang2}{cmd:.     local stem = substr("`f'", 1, strrpos("`f'", ".") - 1)}{p_end}
+{phang2}{cmd:.     addlogo using "graphs/`f'", logo("logo.png") saving("branded/`stem'.png") replace}{p_end}
+{phang2}{cmd:. {c )-}}{p_end}
+
 
 {marker changes}{...}
 {title:Changes}
+
+{phang}1.0.2 (2026-11-09): {cmd:opacity()} now fades a logo without an alpha
+channel under ImageMagick too; {cmd:name()} works after an earlier
+{cmd:addlogo using} {it:*.gph} in batch mode; {cmd:scale()}, {cmd:pad()} and
+{cmd:width()} are validated; a missing {cmd:saving()} folder is a clear error
+(r(603)); the engine's messages are shown when compositing fails; on Windows
+the engine runs through {cmd:cmd /c} and the usual install folders are
+probed.{p_end}
 
 {phang}1.0.1 (2026-11-09): long-form positions ({cmd:northwest}, {cmd:top-left},
 {cmd:center}, ...) now work with the ImageMagick engine (they fell back to
@@ -219,13 +244,6 @@ deletes the source image; an unreadable logo now fails instead of reusing a
 logo resized by an earlier call; temporary files are removed on every exit;
 the width probe no longer uses {cmd:/dev/null} on Windows; a leading {cmd:~} is
 expanded.{p_end}
-
-{pstd}Batch-brand every {cmd:.gph} in a folder:{p_end}
-{phang2}{cmd:. local files : dir "graphs" files "*.gph"}{p_end}
-{phang2}{cmd:. foreach f of local files {c -(}}{p_end}
-{phang2}{cmd:.     local stem = substr("`f'", 1, strrpos("`f'", ".") - 1)}{p_end}
-{phang2}{cmd:.     addlogo using "graphs/`f'", logo("logo.png") saving("branded/`stem'.png") replace}{p_end}
-{phang2}{cmd:. {c )-}}{p_end}
 
 
 {marker remarks}{...}

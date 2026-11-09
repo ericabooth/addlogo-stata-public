@@ -42,15 +42,17 @@ global ADDLOGO_PY     "/opt/homebrew/bin/python3"      // the python3 that has P
 | `logo(file)`      | —      | logo image, ideally a **PNG with transparency** *(required)* |
 | `saving(file)`    | —      | output; format from extension (`png` `tif` `jpg` `pdf`) *(required)* |
 | `position(str)`   | `se`   | `nw n ne w c e sw s se` (long forms + `top-left` etc. ok with both engines; anything else is an error) |
-| `scale(#)`        | `.12`  | logo **width as a fraction of the graph width** |
-| `pad(#)`          | `.02`  | margin from the edge, as a fraction of graph width |
-| `opacity(#)`      | `1`    | `0`–`1` alpha multiplier (e.g. `.85` for a subtle watermark) |
+| `scale(#)`        | `.12`  | logo **width as a fraction of the graph width** (above 0, at most 1) |
+| `pad(#)`          | `.02`  | margin from the edge, as a fraction of graph width (0 to below .5) |
+| `opacity(#)`      | `1`    | `0`–`1` alpha multiplier (e.g. `.85` for a subtle watermark); works on logos with or without transparency |
 | `width(#)`        | `2400` | export width in px when stamping the current/named graph |
 | `name(str)`       | —      | export a specific named graph in memory |
 | `engine(str)`     | `auto` | `auto` \| `python` \| `magick` |
 | `pyexec(str)`     | —      | python interpreter that has Pillow |
 | `magickexec(str)` | —      | path to the `magick` binary |
 | `replace`         | —      | overwrite `saving()` (written only after the composite succeeds, so `saving()` may equal `using`) |
+
+The folder named in `saving()` must already exist. If compositing fails, `addlogo` prints the engine's own messages.
 
 `addlogo` is `rclass`: it returns `r(file)` (the output written) and `r(engine)`.
 
@@ -74,6 +76,7 @@ addlogo, logo("$LOGO") saving("fig1.png") position(nw) scale(.18) opacity(.85) r
 **Batch-brand a whole folder of saved `.gph` files:**
 
 ```stata
+capture mkdir "branded"
 local files : dir "graphs" files "*.gph"
 foreach f of local files {
     local stem = substr("`f'", 1, strrpos("`f'", ".") - 1)
@@ -106,5 +109,7 @@ python addlogo_helper.py --base fig.png --logo logo.png --out fig.png --position
 Eric A. Booth, Sr Researcher, Texas 2036 (eric.a.booth@gmail.com), 2026. MIT-licensed. Part of a Stata suite alongside [`googlechart`](https://github.com/ericabooth/googlechart-stata-public), [`googlesheets`](https://github.com/ericabooth/googlesheets-stata-public), and [`webapi`](https://github.com/ericabooth/webapi-stata-public).
 
 ## Changes
+
+- **1.0.2 (2026-11-09):** `opacity()` now fades a logo without an alpha channel (a JPG, or a PNG without transparency) under ImageMagick too; it had no effect there. `name()` works after an earlier `addlogo using *.gph` in batch mode (it failed with "could not find Graph window"). `scale()`, `pad()` and `width()` are validated. A missing `saving()` folder is a clear error (r(603)). When compositing fails, the engine's own messages are shown. On Windows the engine runs through `cmd /c` with full quoting, and the ImageMagick, python.org and `py` launcher install locations are probed.
 
 - **1.0.1 (2026-11-09):** long-form positions (`northwest`, `top-left`, `center`, ...) now work with the ImageMagick engine (they silently fell back to `se`), and an unknown position is an error (r(198)). Re-branding in place (`using X ... saving(X) replace`) no longer deletes `X`: the composite goes to a temporary file and is copied over `saving()` only on success. An unreadable logo now fails instead of reusing a logo resized by an earlier call, and temporary files are removed on every exit. The width probe no longer redirects to `/dev/null` on Windows. A leading `~` in `logo()`, `saving()` or `using` is expanded from `HOME`.
